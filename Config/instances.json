@@ -1,0 +1,35 @@
+{
+  "central_repository": {
+    "datasource": "YOUR-CENTRAL-SQL"
+  },
+  "clusters": [
+    {
+      "name": "FCI-CL1",
+      "instances": [
+        "VIP\\SQL01",
+        "VIP\\SQL02"
+      ]
+    },
+    {
+      "name": "FCI-CL2",
+      "instances": [
+        "VIP\\SQL03",
+        "VIP\\SQL04"
+      ]
+    },
+    {
+      "name": "FCI-CL3",
+      "instances": [
+        "VIP\\SQL05",
+        "VIP\\SQL06"
+      ]
+    },
+    {
+      "name": "FCI-CL4",
+      "instances": [
+        "VIP\\SQL07",
+        "VIP\\SQL08"
+      ]
+    }
+  ]
+}

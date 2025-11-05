@@ -1,0 +1,20 @@
+digraph Monitoring {
+  rankdir=LR;
+  node [shape=box, style=rounded];
+  subgraph cluster_FCI {
+    label="4x Windows Server Failover Clusters (FCI)";
+    "VIP\\SQL01"; "VIP\\SQL02"; "VIP\\SQL03"; "VIP\\SQL04";
+    "VIP\\SQL05"; "VIP\\SQL06"; "VIP\\SQL07"; "VIP\\SQL08";
+  }
+  "VIP\\SQL01" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL02" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL03" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL04" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL05" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL06" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL07" -> "DBAAdmin" [label="Audit + Collectors"];
+  "VIP\\SQL08" -> "DBAAdmin" [label="Audit + Collectors"];
+  "DBAAdmin" -> "Dashboard: usp_Dashboard_Snapshot";
+  "DBAAdmin" -> "SQL Agent Alerts (Mail)";
+  "DBAAdmin" -> "Monthly HTML Report";
+}

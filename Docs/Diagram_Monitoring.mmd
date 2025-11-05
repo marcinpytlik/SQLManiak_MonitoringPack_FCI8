@@ -1,0 +1,22 @@
+---
+title: SQLManiak Monitoring – Architektura
+---
+flowchart LR
+  subgraph Clusters[4x Windows Server Failover Clusters (FCI)]
+    A1[VIP\SQL01]:::inst -->|Audit + Collectors| R[(DBAAdmin)]
+    A2[VIP\SQL02]:::inst -->|Audit + Collectors| R
+    B1[VIP\SQL03]:::inst -->|Audit + Collectors| R
+    B2[VIP\SQL04]:::inst -->|Audit + Collectors| R
+    C1[VIP\SQL05]:::inst -->|Audit + Collectors| R
+    C2[VIP\SQL06]:::inst -->|Audit + Collectors| R
+    D1[VIP\SQL07]:::inst -->|Audit + Collectors| R
+    D2[VIP\SQL08]:::inst -->|Audit + Collectors| R
+  end
+  R[(Central Repository DBAAdmin)]:::store --> DSH[Dashboard: usp_Dashboard_Snapshot]:::dash
+  R --> ALR[SQL Agent Alerts (Mail)]:::alert
+  R --> RPT[Monthly HTML Report]:::report
+  classDef inst fill:#eef,stroke:#446,stroke-width:1px;
+  classDef store fill:#efe,stroke:#484,stroke-width:1px;
+  classDef dash fill:#ffe,stroke:#aa6,stroke-width:1px;
+  classDef alert fill:#fee,stroke:#a66,stroke-width:1px;
+  classDef report fill:#eef,stroke:#66a,stroke-width:1px;
