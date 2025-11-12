@@ -1,0 +1,182 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup dbadmin (Windows Auth)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-Setup-DbAdmin.ps1",
+        "-ServerName",
+        "${input:serverName}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Setup dbadmin (SQL Auth)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-Setup-DbAdmin.ps1",
+        "-ServerName",
+        "${input:serverName}",
+        "-SqlAuth",
+        "-SqlUser",
+        "${input:sqlUser}",
+        "-SqlPassword",
+        "${input:sqlPassword}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Baseline \u2013 Instance & Databases",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-Baseline.ps1",
+        "-ServerName",
+        "${input:serverName}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy XE",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-XE-Deploy.ps1",
+        "-ServerName",
+        "${input:serverName}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "PBM \u2013 Import & Evaluate",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-PBM-Import.ps1",
+        "-ServerName",
+        "${input:serverName}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Health \u2013 FCI/Cluster",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-HealthCheck.ps1",
+        "-ServerName",
+        "${input:serverName}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Baseline \u2013 DB only (INSERT)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-Baseline.ps1",
+        "-ServerName",
+        "${input:serverName}",
+        "-NoCsv"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Baseline \u2013 CSV only",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-Baseline.ps1",
+        "-ServerName",
+        "${input:serverName}",
+        "-NoDbInsert"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Health \u2013 DB only (INSERT)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-HealthCheck.ps1",
+        "-ServerName",
+        "${input:serverName}",
+        "-NoCsv"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Health \u2013 CSV only",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/powershell/Invoke-HealthCheck.ps1",
+        "-ServerName",
+        "${input:serverName}",
+        "-NoDbInsert"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "serverName",
+      "type": "promptString",
+      "description": "Nazwa instancji (np. localhost lub SQL01\\MSSQLSERVER)"
+    },
+    {
+      "id": "sqlUser",
+      "type": "promptString",
+      "description": "U\u017cytkownik SQL (np. sa)"
+    },
+    {
+      "id": "sqlPassword",
+      "type": "promptString",
+      "description": "Has\u0142o SQL",
+      "password": true
+    }
+  ]
+}
