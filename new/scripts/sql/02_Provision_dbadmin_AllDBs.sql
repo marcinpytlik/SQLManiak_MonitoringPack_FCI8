@@ -147,6 +147,94 @@ BEGIN
     -- Granty na schemat/tabele dla dbadmin (SELECT/INSERT)
     GRANT SELECT, INSERT, UPDATE ON SCHEMA::dbadmin TO [dbadmin];
 END
+USE DBAdmin;
+GO
+
+------------------------------------------------------------
+-- 1) XE – uproszczone logowanie zdarzeń
+------------------------------------------------------------
+IF OBJECT_ID('dbadmin.XEEvents','U') IS NULL
+BEGIN
+    CREATE TABLE dbadmin.XEEvents (
+        Id              bigint IDENTITY(1,1) PRIMARY KEY,
+        CollectedAt     datetime2(3) NOT NULL CONSTRAINT DF_XEEvents_CollectedAt DEFAULT (sysutcdatetime()),
+        ServerName      sysname      NOT NULL,
+        SessionName     nvarchar(128) NOT NULL,
+        EventName       nvarchar(128) NOT NULL,
+        EventTime       datetime2(3)  NOT NULL,
+        Severity        int           NULL,      -- dla error_reported
+        ErrorNumber     int           NULL,
+        DurationMs      bigint        NULL,
+        CpuTimeMs       bigint        NULL,
+        LogicalReads    bigint        NULL,
+        Username        nvarchar(256) NULL,
+        ClientHost      nvarchar(256) NULL,
+        AppName         nvarchar(256) NULL,
+        DatabaseName    nvarchar(256) NULL,
+        SqlText         nvarchar(max) NULL
+    );
+    CREATE INDEX IX_XEEvents_When_Server ON dbadmin.XEEvents(EventTime DESC, ServerName);
+END
+GO
+
+------------------------------------------------------------
+-- 2) Joby SQL Agenta – definicje
+------------------------------------------------------------
+IF OBJECT_ID('dbadmin.AgentJobs','U') IS NULL
+BEGIN
+    CREATE TABLE dbadmin.AgentJobs (
+        Id              bigint IDENTITY(1,1) PRIMARY KEY,
+        CollectedAt     datetime2(3) NOT NULL CONSTRAINT DF_AgentJobs_CollectedAt DEFAULT (sysutcdatetime()),
+        ServerName      sysname      NOT NULL,
+        JobId           uniqueidentifier NOT NULL,
+        JobName         sysname      NOT NULL,
+        Enabled         bit          NOT NULL,
+        Owner           sysname      NULL,
+        Category        sysname      NULL,
+        Description     nvarchar(512) NULL
+    );
+    CREATE INDEX IX_AgentJobs_Server ON dbadmin.AgentJobs(ServerName, JobName);
+END
+GO
+
+------------------------------------------------------------
+-- 3) Joby SQL Agenta – ostatnie wykonania
+------------------------------------------------------------
+IF OBJECT_ID('dbadmin.AgentJobHistory','U') IS NULL
+BEGIN
+    CREATE TABLE dbadmin.AgentJobHistory (
+        Id              bigint IDENTITY(1,1) PRIMARY KEY,
+        CollectedAt     datetime2(3) NOT NULL CONSTRAINT DF_AgentJobHistory_CollectedAt DEFAULT (sysutcdatetime()),
+        ServerName      sysname      NOT NULL,
+        JobId           uniqueidentifier NOT NULL,
+        JobName         sysname      NOT NULL,
+        RunDateTime     datetime2(0) NOT NULL,
+        RunDurationSec  int          NULL,
+        RunStatus       int          NOT NULL,     -- 0=Failed,1=Succeeded,2=Retry,3=Cancelled
+        Message         nvarchar(max) NULL
+    );
+    CREATE INDEX IX_AgentJobHistory_Server_When ON dbadmin.AgentJobHistory(ServerName, RunDateTime DESC);
+END
+GO
+
+------------------------------------------------------------
+-- 4) Maintenance – snapshot indeksów
+------------------------------------------------------------
+IF OBJECT_ID('dbadmin.IndexStatsSnapshot','U') IS NULL
+BEGIN
+    CREATE TABLE dbadmin.IndexStatsSnapshot (
+        Id                      bigint IDENTITY(1,1) PRIMARY KEY,
+        CollectedAt             datetime2(3) NOT NULL CONSTRAINT DF_IndexStatsSnapshot_CollectedAt DEFAULT (sysutcdatetime()),
+        ServerName              sysname      NOT NULL,
+        DatabaseName            sysname      NOT NULL,
+        ObjectName              sysname      NOT NULL,
+        IndexName               sysname      NOT NULL,
+        AvgFragmentationPercent float        NULL,
+        PageCount               bigint       NULL
+    );
+    CREATE INDEX IX_IndexStatsSnapshot_Server_Db ON dbadmin.IndexStatsSnapshot(ServerName, DatabaseName, CollectedAt DESC);
+END
+
 ELSE
 BEGIN
     RAISERROR('Baza [DBAdmin] nie istnieje – uruchom najpierw 00_Create_DBAdmin.sql', 16, 1);
